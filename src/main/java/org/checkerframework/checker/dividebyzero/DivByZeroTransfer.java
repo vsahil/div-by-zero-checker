@@ -72,6 +72,20 @@ public class DivByZeroTransfer extends CFTransfer {
             AnnotationMirror lhs,
             AnnotationMirror rhs) {
         // TODO
+        if (operator == Comparison.EQ && rhs == nonzero()){
+                return rhs;
+        }
+        if (operator == Comparison.NE && rhs == top()){
+            return nonzero();
+            // return glb(lhs, rhs);
+        }
+        // Can't do anything with operatins like LT, LE, GT, and GE as I can't compare rhs to 0.
+        // Can't do this comparison, losing some completeness. 
+        
+        // if (operator == Comparison.LT && rhs == 0){
+        //     return nonzero();
+        // }
+
         return lhs;
     }
 
@@ -94,6 +108,28 @@ public class DivByZeroTransfer extends CFTransfer {
             AnnotationMirror lhs,
             AnnotationMirror rhs) {
         // TODO
+        // PLUS, MINUS, TIMES, DIVIDE, MOD
+        // Can't do this comparison, losing some completeness. Add something to non-zero can still be zero. 
+        // if (operator == BinaryOperator.PLUS && rhs == nonzero()){
+        //     return rhs;
+        // }
+        
+        // if (operator == BinaryOperator.MINUS && rhs == top()){
+        //     return glb(lhs, rhs);
+        // }
+
+        if (operator == BinaryOperator.TIMES && rhs == nonzero()){
+            return nonzero();
+        }
+        // I don't care about rhs in case of divide, because that is already handled by div-by-zero case. 
+        if (operator == BinaryOperator.DIVIDE && lhs == nonzero()){
+            return nonzero();
+        }
+
+        // Can't say anything. 
+        // if (operator == BinaryOperator.MOD && rhs == top()){
+        //     return glb(lhs, rhs);
+        // }
         return top();
     }
 
@@ -125,6 +161,10 @@ public class DivByZeroTransfer extends CFTransfer {
         return AnnotationBuilder.fromClass(
             analysis.getTypeFactory().getProcessingEnv().getElementUtils(),
             qualifier);
+    }
+
+    private AnnotationMirror nonzero() {
+        return reflect(Nonzero.class);
     }
 
     /** Determine whether two AnnotationMirrors are the same point in the lattice */

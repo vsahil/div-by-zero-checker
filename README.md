@@ -1,3 +1,8 @@
+# My lattice
+
+We consider the domain of zero, non-zero, and unknown numbers. In this case, zero and unknown numbers behave in the same manner -- we should flag a warning when a division contains them in denominator. 
+The division is 100% safe only when we are sure that the denominator is non-zero. Therefore, we consider the simple lattice of two points: Non-zero and Top, where Non-zero constitutes the non-zero domain and Top constitutes the zero + unknown domain. 
+
 # What is this repository
 
 This repository contains a template for an abstract interpretation implementation
@@ -51,3 +56,5 @@ This is useful for testing before you publish it elsewhere, such as to Maven Cen
 The Divide By Zero Checker is built upon the Checker Framework.  Please see
 the [Checker Framework Manual](https://checkerframework.org/manual/) for
 more information about using pluggable type-checkers, including this one.
+
+
