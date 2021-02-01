@@ -1,7 +1,13 @@
-# My lattice
+# My lattice1
 
 We consider the domain of zero, non-zero, and unknown numbers. In this case, zero and unknown numbers behave in the same manner -- we should flag a warning when a division contains them in denominator. 
-The division is 100% safe only when we are sure that the denominator is non-zero. Therefore, we consider the simple lattice of two points: Non-zero and Top, where Non-zero constitutes the non-zero domain and Top constitutes the zero + unknown domain. 
+The division and remainder operations are 100% safe only when we are sure that the denominator is non-zero. Therefore, we consider the simple lattice of two points: Non-zero and Top, where Non-zero constitutes the non-zero domain and Top constitutes the zero + unknown domain. 
+
+# My lattice2
+
+We consider the domain of zero, non-zero, and unknown numbers. 
+And I will have a lattice point for each of them - Zero, Nonzero, and Top respectively. 
+The division and remainder operations are 100% safe only when we are sure that the denominator is non-zero. 
 
 # What is this repository
 

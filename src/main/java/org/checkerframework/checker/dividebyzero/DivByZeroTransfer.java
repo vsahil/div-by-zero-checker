@@ -72,17 +72,37 @@ public class DivByZeroTransfer extends CFTransfer {
             AnnotationMirror lhs,
             AnnotationMirror rhs) {
         // TODO
-        if (operator == Comparison.EQ && rhs == nonzero()){
-                return rhs;
+        if (operator == Comparison.EQ){
+            return rhs;
         }
-        if (operator == Comparison.NE && rhs == top()){
+        // if (operator == Comparison.EQ && rhs == nonzero()){
+        //         return rhs;
+        // }
+        
+        // can't say anything about NE comparison with nonzero and Top. 
+        if (operator == Comparison.NE && AnnotationUtils.areSame(rhs, zero()) ){
             return nonzero();
-            // return glb(lhs, rhs);
         }
+
+
+        // if (operator == Comparison.NE && rhs == top()){
+        //     return nonzero();
+        // }
+
         // Can't do anything with operatins like LT, LE, GT, and GE as I can't compare rhs to 0.
         // Can't do this comparison, losing some completeness. 
         
-        // if (operator == Comparison.LT && rhs == 0){
+        // can't say anything about non-zero and top
+        if (operator == Comparison.LT && AnnotationUtils.areSame(rhs, zero()) ){
+            return nonzero();
+        }
+        // if (operator == Comparison.LE && rhs == zero()){
+        //     return nonzero();
+        // }
+        if (operator == Comparison.GT && AnnotationUtils.areSame(rhs, zero()) ){
+            return nonzero();
+        }
+        // if (operator == Comparison.GT && rhs == zero()){
         //     return nonzero();
         // }
 
@@ -110,26 +130,88 @@ public class DivByZeroTransfer extends CFTransfer {
         // TODO
         // PLUS, MINUS, TIMES, DIVIDE, MOD
         // Can't do this comparison, losing some completeness. Add something to non-zero can still be zero. 
-        // if (operator == BinaryOperator.PLUS && rhs == nonzero()){
-        //     return rhs;
-        // }
+        /*
+            | + and - | Top | Nonzero | Zero    |   |
+            |---------|-----|---------|---------|---|
+            | Top     | Top | Top     | Top     |   |
+            | Nonzero | Top | Top     | Nonzero |   |
+            | Zero    | Top | Nonzero | Zero    |   |
+        */
+
+        if (operator == BinaryOperator.PLUS && ( AnnotationUtils.areSame(lhs, nonzero()) && AnnotationUtils.areSame(rhs, zero()) ) ){
+            return nonzero();
+        }
+
+        if (operator == BinaryOperator.PLUS && ( AnnotationUtils.areSame(lhs, zero()) && AnnotationUtils.areSame(rhs, nonzero()) ) ){
+            return nonzero();
+        }
+
+        if (operator == BinaryOperator.PLUS && ( AnnotationUtils.areSame(lhs, zero()) && AnnotationUtils.areSame(rhs, zero()) ) ){
+            return zero();
+        }
         
-        // if (operator == BinaryOperator.MINUS && rhs == top()){
-        //     return glb(lhs, rhs);
-        // }
 
-        if (operator == BinaryOperator.TIMES && rhs == nonzero()){
+        if (operator == BinaryOperator.MINUS && ( AnnotationUtils.areSame(lhs, nonzero()) && AnnotationUtils.areSame(rhs, zero()) ) ){
             return nonzero();
         }
+
+        if (operator == BinaryOperator.MINUS && ( AnnotationUtils.areSame(lhs, zero()) && AnnotationUtils.areSame(rhs, nonzero()) ) ){
+            return nonzero();
+        }
+
+        if (operator == BinaryOperator.MINUS && (AnnotationUtils.areSame(lhs, zero()) && AnnotationUtils.areSame(rhs, zero()) ) ){
+            return zero();
+        }
+
+        /*
+
+            | *       | Top  | Nonzero | Zero |   |
+            |---------|------|---------|------|---|
+            | Top     | Top  | Top     | Zero |   |
+            | Nonzero | Top  | Nonzero | Zero |   |
+            | Zero    | Zero | Zero    | Zero |   |
+
+        */
+
+        if (operator == BinaryOperator.TIMES && ( AnnotationUtils.areSame(lhs, zero()) || AnnotationUtils.areSame(rhs, zero()) ) ){
+            return zero();
+        }
+
+        if (operator == BinaryOperator.TIMES && ( AnnotationUtils.areSame(lhs, nonzero()) && AnnotationUtils.areSame(rhs, nonzero()) ) ){
+            return nonzero();
+        }
+
+        /*
+
+            | /       | Top     | Nonzero | Zero  |   |
+            |---------|---------|---------|-------|---|
+            | Top     | Top     | Top     | Error |   |
+            | Nonzero | Nonzero | Nonzero | Error |   |
+            | Zero    | Zero    | Zero    | Error |   |
+
+        */
         // I don't care about rhs in case of divide, because that is already handled by div-by-zero case. 
-        if (operator == BinaryOperator.DIVIDE && lhs == nonzero()){
+        if (operator == BinaryOperator.DIVIDE && AnnotationUtils.areSame(lhs, nonzero()) ){
             return nonzero();
         }
+        
+        if (operator == BinaryOperator.DIVIDE && AnnotationUtils.areSame(lhs, zero()) ){
+            return zero();
+        }
 
-        // Can't say anything. 
-        // if (operator == BinaryOperator.MOD && rhs == top()){
-        //     return glb(lhs, rhs);
-        // }
+        /*
+
+            | %       | Top  | Nonzero | Zero  |   |
+            |---------|------|---------|-------|---|
+            | Top     | Top  | Top     | Error |   |
+            | Nonzero | Top  | Top     | Error |   |
+            | Zero    | Zero | Zero    | Error |   |
+
+        */
+
+        if (operator == BinaryOperator.MOD && AnnotationUtils.areSame(lhs, zero()) ){
+            return zero();
+        }
         return top();
     }
 
@@ -165,6 +247,10 @@ public class DivByZeroTransfer extends CFTransfer {
 
     private AnnotationMirror nonzero() {
         return reflect(Nonzero.class);
+    }
+
+    private AnnotationMirror zero() {
+        return reflect(Zero.class);
     }
 
     /** Determine whether two AnnotationMirrors are the same point in the lattice */
