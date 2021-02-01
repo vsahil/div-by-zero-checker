@@ -1,3 +1,5 @@
+# Final lattice is Lattice3
+
 # My lattice1
 
 We consider the domain of zero, non-zero, and unknown numbers. In this case, zero and unknown numbers behave in the same manner -- we should flag a warning when a division contains them in denominator. 
