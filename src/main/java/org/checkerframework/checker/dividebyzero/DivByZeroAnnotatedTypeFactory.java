@@ -35,6 +35,14 @@ public class DivByZeroAnnotatedTypeFactory extends BaseAnnotatedTypeFactory {
                 return Zero.class;
             }
             
+            if (intValue > 0){
+                return Positive.class;
+            }
+
+            if (intValue < 0){
+                return Negative.class;
+            }
+
             if (intValue != 0){
                 return Nonzero.class;
             }
@@ -45,6 +53,14 @@ public class DivByZeroAnnotatedTypeFactory extends BaseAnnotatedTypeFactory {
             // TODO
             if (longValue == 0){
                 return Zero.class;
+            }
+
+            if (longValue > 0){
+                return Positive.class;
+            }
+
+            if (longValue < 0){
+                return Negative.class;
             }
             
             if (longValue != 0){

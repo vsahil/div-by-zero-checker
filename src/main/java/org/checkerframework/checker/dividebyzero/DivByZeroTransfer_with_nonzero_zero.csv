@@ -75,18 +75,13 @@ public class DivByZeroTransfer extends CFTransfer {
         if (operator == Comparison.EQ){
             return rhs;
         }
+        // if (operator == Comparison.EQ && rhs == nonzero()){
+        //         return rhs;
+        // }
         
         // can't say anything about NE comparison with nonzero and Top. 
         if (operator == Comparison.NE && AnnotationUtils.areSame(rhs, zero()) ){
             return nonzero();
-        }
-
-        if (operator == Comparison.NE && AnnotationUtils.areSame(rhs, positive() ) ){
-            return negative();
-        }
-
-        if (operator == Comparison.NE && AnnotationUtils.areSame(rhs, negative() ) ){
-            return positive();
         }
 
 
@@ -94,38 +89,22 @@ public class DivByZeroTransfer extends CFTransfer {
         //     return nonzero();
         // }
 
-        if (operator == Comparison.LT && AnnotationUtils.areSame(rhs, negative() ) ){
-            return negative();
-        }
-
-        if (operator == Comparison.LT && AnnotationUtils.areSame(rhs, zero() ) ){
-            return negative();
-        }
-
-        // Can't say anything for LT operator, with positive and nonzero classes. 
-
-        if (operator == Comparison.LE && AnnotationUtils.areSame(rhs, negative() ) ){
-            return negative();
-        }
-
-        // Can't say anything for LE operator, with positive, zero, and nonzero classes. 
+        // Can't do anything with operatins like LT, LE, GT, and GE as I can't compare rhs to 0.
+        // Can't do this comparison, losing some completeness. 
         
-
+        // can't say anything about non-zero and top
+        if (operator == Comparison.LT && AnnotationUtils.areSame(rhs, zero()) ){
+            return nonzero();
+        }
+        // if (operator == Comparison.LE && rhs == zero()){
+        //     return nonzero();
+        // }
         if (operator == Comparison.GT && AnnotationUtils.areSame(rhs, zero()) ){
-            return positive();
+            return nonzero();
         }
-
-        if (operator == Comparison.GT && AnnotationUtils.areSame(rhs, positive()) ){
-            return positive();
-        }
-
-        // Can't say anything for GT operator, with negative and nonzero classes. 
-
-        if (operator == Comparison.GE && AnnotationUtils.areSame(rhs, positive()) ){
-            return positive();
-        }
-
-        // Can't say anything for GE operator, with negative, zero, and nonzero classes. 
+        // if (operator == Comparison.GT && rhs == zero()){
+        //     return nonzero();
+        // }
 
         return lhs;
     }
@@ -152,13 +131,11 @@ public class DivByZeroTransfer extends CFTransfer {
         // PLUS, MINUS, TIMES, DIVIDE, MOD
         // Can't do this comparison, losing some completeness. Add something to non-zero can still be zero. 
         /*
-            | +       | Top | Nonzero | Zero    | Positive  | Negative
-            |---------|-----|---------|---------|-----------|---------|
-            | Top     | Top | Top     | Top     | Top       |    Top  | 
-            | Nonzero | Top | Top     | Nonzero | Top       |    Top  | 
-            | Zero    | Top | Nonzero | Zero    | Positive  | Negative|  
-            | Positive| Top | Top     | Positive| Positive  |    Top  |
-            | Negative| Top | Top     | Negative| Top       | Negative|
+            | + and - | Top | Nonzero | Zero    |   |
+            |---------|-----|---------|---------|---|
+            | Top     | Top | Top     | Top     |   |
+            | Nonzero | Top | Top     | Nonzero |   |
+            | Zero    | Top | Nonzero | Zero    |   |
         */
 
         if (operator == BinaryOperator.PLUS && ( AnnotationUtils.areSame(lhs, nonzero()) && AnnotationUtils.areSame(rhs, zero()) ) ){
@@ -172,40 +149,7 @@ public class DivByZeroTransfer extends CFTransfer {
         if (operator == BinaryOperator.PLUS && ( AnnotationUtils.areSame(lhs, zero()) && AnnotationUtils.areSame(rhs, zero()) ) ){
             return zero();
         }
-
-        if (operator == BinaryOperator.PLUS && ( AnnotationUtils.areSame(lhs, zero()) && AnnotationUtils.areSame(rhs, positive()) ) ){
-            return positive();
-        }
-
-        if (operator == BinaryOperator.PLUS && ( AnnotationUtils.areSame(lhs, positive()) && AnnotationUtils.areSame(rhs, zero()) ) ){
-            return positive();
-        }
         
-        if (operator == BinaryOperator.PLUS && ( AnnotationUtils.areSame(lhs, zero()) && AnnotationUtils.areSame(rhs, negative()) ) ){
-            return negative();
-        }
-
-        if (operator == BinaryOperator.PLUS && ( AnnotationUtils.areSame(lhs, negative()) && AnnotationUtils.areSame(rhs, zero()) ) ){
-            return negative();
-        }
-
-        if (operator == BinaryOperator.PLUS && ( AnnotationUtils.areSame(lhs, positive()) && AnnotationUtils.areSame(rhs, positive()) ) ){
-            return positive();
-        }
-
-        if (operator == BinaryOperator.PLUS && ( AnnotationUtils.areSame(lhs, negative()) && AnnotationUtils.areSame(rhs, negative()) ) ){
-            return negative();
-        }
-
-        /*
-            | -       | Top | Nonzero | Zero    | Positive  | Negative
-            |---------|-----|---------|---------|-----------|---------|
-            | Top     | Top | Top     | Top     | Top       |    Top  | 
-            | Nonzero | Top | Top     | Nonzero | Top       |    Top  | 
-            | Zero    | Top | Nonzero | Zero    | Negative  | Positive|  
-            | Positive| Top | Top     | Positive| Top       | Positive|
-            | Negative| Top | Top     | Negative| Negative  | Top     |
-        */
 
         if (operator == BinaryOperator.MINUS && ( AnnotationUtils.areSame(lhs, nonzero()) && AnnotationUtils.areSame(rhs, zero()) ) ){
             return nonzero();
@@ -219,40 +163,14 @@ public class DivByZeroTransfer extends CFTransfer {
             return zero();
         }
 
-        if (operator == BinaryOperator.MINUS && ( AnnotationUtils.areSame(lhs, positive()) && AnnotationUtils.areSame(rhs, zero()) ) ){
-            return positive();
-        }
-
-        if (operator == BinaryOperator.MINUS && ( AnnotationUtils.areSame(lhs, negative()) && AnnotationUtils.areSame(rhs, zero()) ) ){
-            return negative();
-        }
-        
-        if (operator == BinaryOperator.MINUS && ( AnnotationUtils.areSame(lhs, zero()) && AnnotationUtils.areSame(rhs, positive()) ) ){
-            return negative();
-        }
-
-        if (operator == BinaryOperator.MINUS && ( AnnotationUtils.areSame(lhs, zero()) && AnnotationUtils.areSame(rhs, negative()) ) ){
-            return positive();
-        }
-
-        if (operator == BinaryOperator.MINUS && ( AnnotationUtils.areSame(lhs, positive()) && AnnotationUtils.areSame(rhs, negative()) ) ){
-            return positive();
-        }
-
-        if (operator == BinaryOperator.MINUS && ( AnnotationUtils.areSame(lhs, negative()) && AnnotationUtils.areSame(rhs, positive()) ) ){
-            return negative();
-        }
-
         /*
 
-            | *       | Top | Nonzero | Zero    | Positive  | Negative
-            |---------|-----|---------|---------|-----------|---------|
-            | Top     | Top | Top     | Zero    | Top       |    Top  | 
-            | Nonzero | Top | Nonzero | Zero    | Nonzero   | Nonzero | 
-            | Zero    | Zero| Zero    | Zero    | Zero      | Zero    |  
-            | Positive| Top | Nonzero | Zero    | Positive  | Negative|
-            | Negative| Top | Nonzero | Zero    | Negative  | Positive|
-    
+            | *       | Top  | Nonzero | Zero |   |
+            |---------|------|---------|------|---|
+            | Top     | Top  | Top     | Zero |   |
+            | Nonzero | Top  | Nonzero | Zero |   |
+            | Zero    | Zero | Zero    | Zero |   |
+
         */
 
         if (operator == BinaryOperator.TIMES && ( AnnotationUtils.areSame(lhs, zero()) || AnnotationUtils.areSame(rhs, zero()) ) ){
@@ -263,48 +181,13 @@ public class DivByZeroTransfer extends CFTransfer {
             return nonzero();
         }
 
-        if (operator == BinaryOperator.TIMES && ( AnnotationUtils.areSame(lhs, positive()) && AnnotationUtils.areSame(rhs, nonzero()) ) ){
-            return nonzero();
-        }
-
-        if (operator == BinaryOperator.TIMES && ( AnnotationUtils.areSame(lhs, nonzero()) && AnnotationUtils.areSame(rhs, positive()) ) ){
-            return nonzero();
-        }
-
-        if (operator == BinaryOperator.TIMES && ( AnnotationUtils.areSame(lhs, negative()) && AnnotationUtils.areSame(rhs, nonzero()) ) ){
-            return nonzero();
-        }
-        
-        if (operator == BinaryOperator.TIMES && ( AnnotationUtils.areSame(lhs, nonzero()) && AnnotationUtils.areSame(rhs, negative()) ) ){
-            return nonzero();
-        }
-
-        if (operator == BinaryOperator.TIMES && ( AnnotationUtils.areSame(lhs, positive()) && AnnotationUtils.areSame(rhs, positive()) ) ){
-            return positive();
-        }
-
-        if (operator == BinaryOperator.TIMES && ( AnnotationUtils.areSame(lhs, positive()) && AnnotationUtils.areSame(rhs, negative()) ) ){
-            return negative();
-        }
-
-        if (operator == BinaryOperator.TIMES && ( AnnotationUtils.areSame(lhs, negative()) && AnnotationUtils.areSame(rhs, positive()) ) ){
-            return negative();
-        }
-
-        if (operator == BinaryOperator.TIMES && ( AnnotationUtils.areSame(lhs, negative()) && AnnotationUtils.areSame(rhs, negative()) ) ){
-            return positive();
-        }
-
         /*
 
-            | /       | Top   | Nonzero | Zero    | Positive  | Negative
-            |---------|-------|---------|---------|-----------|---------|
-            | Top     | Error | Top     | Error   | Top       |    Top  | 
-            | Nonzero | Error | Nonzero | Error   | Nonzero   | Nonzero | 
-            | Zero    | Error | Zero    | Error   | Zero      | Zero    |  
-            | Positive| Error | Nonzero | Error   | Positive  | Negative|
-            | Negative| Error | Nonzero | Error   | Negative  | Positive|
-
+            | /       | Top     | Nonzero | Zero  |   |
+            |---------|---------|---------|-------|---|
+            | Top     | Top     | Top     | Error |   |
+            | Nonzero | Nonzero | Nonzero | Error |   |
+            | Zero    | Zero    | Zero    | Error |   |
 
         */
         // I don't care about rhs in case of divide, because that is already handled by div-by-zero case. 
@@ -316,48 +199,13 @@ public class DivByZeroTransfer extends CFTransfer {
             return zero();
         }
 
-        if (operator == BinaryOperator.DIVIDE && ( AnnotationUtils.areSame(lhs, positive()) && AnnotationUtils.areSame(rhs, nonzero()) ) ){
-            return nonzero();
-        }
-
-        if (operator == BinaryOperator.DIVIDE && ( AnnotationUtils.areSame(lhs, nonzero()) && AnnotationUtils.areSame(rhs, positive()) ) ){
-            return nonzero();
-        }
-
-        if (operator == BinaryOperator.DIVIDE && ( AnnotationUtils.areSame(lhs, negative()) && AnnotationUtils.areSame(rhs, nonzero()) ) ){
-            return nonzero();
-        }
-
-        if (operator == BinaryOperator.DIVIDE && ( AnnotationUtils.areSame(lhs, nonzero()) && AnnotationUtils.areSame(rhs, negative()) ) ){
-            return nonzero();
-        }
-
-        if (operator == BinaryOperator.DIVIDE && ( AnnotationUtils.areSame(lhs, positive()) && AnnotationUtils.areSame(rhs, positive()) ) ){
-            return positive();
-        }
-
-        if (operator == BinaryOperator.DIVIDE && ( AnnotationUtils.areSame(lhs, positive()) && AnnotationUtils.areSame(rhs, negative()) ) ){
-            return negative();
-        }
-
-        if (operator == BinaryOperator.DIVIDE && ( AnnotationUtils.areSame(lhs, negative()) && AnnotationUtils.areSame(rhs, positive()) ) ){
-            return negative();
-        }
-
-        if (operator == BinaryOperator.DIVIDE && ( AnnotationUtils.areSame(lhs, negative()) && AnnotationUtils.areSame(rhs, negative()) ) ){
-            return negative();
-        }
-
-
         /*
 
-            | %       | Top   | Nonzero | Zero    | Positive  | Negative
-            |---------|-------|---------|---------|-----------|---------|
-            | Top     | Error | Top     | Error   | Top       |    Top  | 
-            | Nonzero | Error | Top     | Error   | Top       |    Top  | 
-            | Zero    | Error | Zero    | Error   | Zero      |    Zero |  
-            | Positive| Error | Top     | Error   | Top       |    Top  |
-            | Negative| Error | Top     | Error   | Top       |    Top  |
+            | %       | Top  | Nonzero | Zero  |   |
+            |---------|------|---------|-------|---|
+            | Top     | Top  | Top     | Error |   |
+            | Nonzero | Top  | Top     | Error |   |
+            | Zero    | Zero | Zero    | Error |   |
 
         */
 
@@ -399,14 +247,6 @@ public class DivByZeroTransfer extends CFTransfer {
 
     private AnnotationMirror nonzero() {
         return reflect(Nonzero.class);
-    }
-
-    private AnnotationMirror positive() {
-        return reflect(Positive.class);
-    }
-
-    private AnnotationMirror negative() {
-        return reflect(Negative.class);
     }
 
     private AnnotationMirror zero() {

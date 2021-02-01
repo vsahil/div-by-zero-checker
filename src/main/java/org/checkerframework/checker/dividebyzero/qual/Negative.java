@@ -6,8 +6,9 @@ import java.lang.annotation.Target;
 import java.lang.annotation.ElementType;
 
 // @DefaultQualifierInHierarchy     // Important to comment this out. 
-@SubtypeOf({Positive.class, Negative.class, Zero.class}) 
+@SubtypeOf({Nonzero.class}) // back to top 
 @Target({ElementType.TYPE_USE, ElementType.TYPE_PARAMETER})
 
+// Do we need QualifierForLiterals and DefaultFor in this file?
 
-public @interface Bottom { }
+public @interface Negative { }
